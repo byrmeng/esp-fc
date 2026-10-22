@@ -1,6 +1,7 @@
 #include "Hardware.h"
 #include "Device/Baro/BaroBMP085.hpp"
 #include "Device/Baro/BaroBMP280.hpp"
+#include "Device/Baro/BaroMS5637.hpp"
 #include "Device/Baro/BaroSPL06.hpp"
 #include "Device/BaroDevice.hpp"
 #include "Device/Gyro/GyroBMI160.hpp"
@@ -36,6 +37,7 @@ static Espfc::Device::Mag::MagAK8963 ak8963;
 static Espfc::Device::Baro::BaroBMP085 bmp085;
 static Espfc::Device::Baro::BaroBMP280 bmp280;
 static Espfc::Device::Baro::BaroSPL06 spl06;
+static Espfc::Device::Baro::BaroMS5637 ms5637;
 } // namespace
 
 namespace Espfc {
@@ -186,6 +188,7 @@ void Hardware::detectBaro()
     if (!detectedBaro && detectDevice(bmp280, _i2cBus)) detectedBaro = &bmp280;
     if (!detectedBaro && detectDevice(bmp085, _i2cBus)) detectedBaro = &bmp085;
     if (!detectedBaro && detectDevice(spl06, _i2cBus)) detectedBaro = &spl06;
+    if (!detectedBaro && detectDevice(ms5637, _i2cBus)) detectedBaro = &ms5637; // last, no id register; command writes need a direct bus
   }
 #endif
   if (gyroSlaveBus.getBus())
