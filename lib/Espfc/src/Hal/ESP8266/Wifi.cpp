@@ -68,9 +68,14 @@ void Wifi::setListener(WifiListener* l)
   });
 }
 
-bool Wifi::startAp(const char* ssid)
+bool Wifi::startAp(const char* ssid, const char* pass)
 {
-  return WiFi.softAP(ssid);
+  return WiFi.softAP(ssid, pass);
+}
+
+void Wifi::getApMac(uint8_t* mac)
+{
+  WiFi.softAPmacAddress(mac);
 }
 
 bool Wifi::startSta(const char* ssid, const char* pass)

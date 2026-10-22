@@ -768,8 +768,16 @@ struct VBatConfig
   int16_t cellWarning = 350;
   uint8_t scale = 100;
   uint8_t resDiv = 10;
+#ifdef ESPFC_ADC_VBAT_RES_MULT
+  uint8_t resMult = ESPFC_ADC_VBAT_RES_MULT;
+#else
   uint8_t resMult = 1;
+#endif
+#ifdef ESPFC_ADC_VBAT_SOURCE
+  int8_t source = ESPFC_ADC_VBAT_SOURCE;
+#else
   int8_t source = VBAT_SOURCE_NONE;
+#endif
 };
 
 enum IBatSource : int8_t
@@ -1112,7 +1120,11 @@ public:
   bool telemetry = 0;
   int32_t telemetryInterval = 1000;
   uint8_t rescueConfigDelay = 30;
+#ifdef ESPFC_BOARD_ALIGN_YAW
+  int16_t boardAlignment[3] = {0, 0, ESPFC_BOARD_ALIGN_YAW};
+#else
   int16_t boardAlignment[3] = {0, 0, 0};
+#endif
   char modelName[MODEL_NAME_LEN + 1];
 
   ModelConfig()

@@ -60,7 +60,8 @@ class Wifi
 public:
   static bool begin();
   static void setListener(WifiListener* listener);
-  static bool startAp(const char* ssid);
+  static bool startAp(const char* ssid, const char* pass = nullptr);
+  static void getApMac(uint8_t* mac);
   static bool startSta(const char* ssid, const char* pass);
   static bool isApActive();
   static void getStatus(WifiStatus& status);

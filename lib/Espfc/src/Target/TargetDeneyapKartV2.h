@@ -74,14 +74,18 @@
 #define ESPFC_LED_TYPE 1    // LED_STRIP
 
 #define ESPFC_ADC_VBAT
-#define ESPFC_ADC_VBAT_PIN 4 // A0
+#define ESPFC_ADC_VBAT_PIN 3 // VBAT_ADC, onboard 100k/100k divider on LiPo connector
+#define ESPFC_ADC_VBAT_SOURCE VBAT_SOURCE_ADC
+#define ESPFC_ADC_VBAT_RES_MULT 2
 
-#define ESPFC_ADC_IBAT
-#define ESPFC_ADC_IBAT_PIN 5 // A1
+#define ESPFC_ADC_SCALE (3.1f / 4096) // ESP32-S3 ADC full scale at default 11dB attenuation
 
-#define ESPFC_ADC_SCALE (3.3f / 4096)
+#define ESPFC_FEATURE_MASK (FEATURE_RX_SERIAL | FEATURE_SOFTSERIAL) // softserial enables wifi msp
 
-#define ESPFC_FEATURE_MASK (FEATURE_RX_SERIAL)
+#define ESPFC_BOARD_ALIGN_YAW 270
+
+#define ESPFC_WIFI_AP_SSID_PREFIX "DeneyapFC"
+#define ESPFC_WIFI_AP_PASS "deneyapfc"
 
 #define ESPFC_GYRO_I2C_RATE_MAX 1000
 #define ESPFC_GYRO_SPI_RATE_MAX 4000

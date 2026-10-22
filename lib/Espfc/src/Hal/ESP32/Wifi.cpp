@@ -3,6 +3,7 @@
 #include "Hal/Wifi.hpp"
 #include "Hal/Serial.hpp"
 #include <WiFi.h>
+#include <esp_mac.h>
 #include <algorithm>
 #include <cstring>
 
@@ -87,9 +88,14 @@ void Wifi::setListener(WifiListener* l)
       ARDUINO_EVENT_WIFI_AP_STACONNECTED);
 }
 
-bool Wifi::startAp(const char* ssid)
+bool Wifi::startAp(const char* ssid, const char* pass)
 {
-  return WiFi.softAP(ssid);
+  return WiFi.softAP(ssid, pass);
+}
+
+void Wifi::getApMac(uint8_t* mac)
+{
+  esp_read_mac(mac, ESP_MAC_WIFI_SOFTAP);
 }
 
 bool Wifi::startSta(const char* ssid, const char* pass)

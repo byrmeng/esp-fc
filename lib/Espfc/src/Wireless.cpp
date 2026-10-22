@@ -22,8 +22,21 @@ int Wireless::begin()
 
 void Wireless::startAp()
 {
-  bool status = Hal::Wifi::startAp("ESP-FC");
-  _model.logger.info().log("WIFI AP START").logln(status);
+#ifdef ESPFC_WIFI_AP_SSID_PREFIX
+  uint8_t mac[6] = {0};
+  Hal::Wifi::getApMac(mac);
+  char ssid[33];
+  snprintf(ssid, sizeof(ssid), "%s-%02X%02X", ESPFC_WIFI_AP_SSID_PREFIX, mac[4], mac[5]);
+#else
+  const char* ssid = "ESP-FC";
+#endif
+#ifdef ESPFC_WIFI_AP_PASS
+  const char* pass = ESPFC_WIFI_AP_PASS;
+#else
+  const char* pass = nullptr;
+#endif
+  bool status = Hal::Wifi::startAp(ssid, pass);
+  _model.logger.info().log("WIFI AP START").log(ssid).logln(status);
 }
 
 int Wireless::connect()
