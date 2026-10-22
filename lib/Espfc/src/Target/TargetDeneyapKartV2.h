@@ -78,7 +78,8 @@
 #define ESPFC_ADC_VBAT_SOURCE VBAT_SOURCE_ADC
 #define ESPFC_ADC_VBAT_RES_MULT 2
 
-#define ESPFC_ADC_SCALE (3.1f / 4096) // ESP32-S3 ADC full scale at default 11dB attenuation
+#define ESPFC_ADC_MILLIVOLTS // calibrated reads, raw S3 ADC reads ~12% low on this divider
+#define ESPFC_ADC_SCALE (0.001f)
 
 #define ESPFC_FEATURE_MASK (FEATURE_RX_SERIAL | FEATURE_SOFTSERIAL) // softserial enables wifi msp
 
