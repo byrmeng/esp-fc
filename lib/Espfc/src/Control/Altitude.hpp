@@ -26,7 +26,7 @@ public:
     switch (event)
     {
       case MODEL_CHANGE_FILTER:
-        _altitudeFilter.begin(FilterConfig(FILTER_PT3, 5), _model.state.accel.timer.rate);
+        _altitudeFilter.begin(_model.config.baro.filter, _model.state.accel.timer.rate); // baro_lpf_type/freq
         _varioFilter.begin(FilterConfig(FILTER_PT3, 5), _model.state.accel.timer.rate);
         _varioFusion.begin(_model.state.accel.timer.rate, _model.config.altHold.baroTau * 0.1f);
         break;

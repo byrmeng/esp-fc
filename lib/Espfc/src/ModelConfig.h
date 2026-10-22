@@ -829,7 +829,7 @@ struct BaroConfig
 #else
   int8_t dev = BARO_NONE;
 #endif
-  FilterConfig filter{FILTER_BIQUAD, 3};
+  FilterConfig filter{FILTER_PT3, 5}; // altitude lpf
 };
 
 struct MagConfig
