@@ -81,7 +81,7 @@
 #define ESPFC_ADC_MILLIVOLTS // calibrated reads, raw S3 ADC reads ~12% low on this divider
 #define ESPFC_ADC_SCALE (0.001f)
 
-#define ESPFC_FEATURE_MASK (FEATURE_RX_SERIAL | FEATURE_SOFTSERIAL) // softserial enables wifi msp
+#define ESPFC_FEATURE_MASK (FEATURE_RX_SERIAL) // wifi msp: set feature_soft_serial 1
 
 #define ESPFC_BOARD_ALIGN_YAW 270
 
