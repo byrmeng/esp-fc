@@ -50,7 +50,7 @@ int GyroSensor::reload(ModelChangeEvent event)
   switch (event)
   {
     case MODEL_CHANGE_FILTER:
-      _model.state.gyro.scale = Utils::toRad(2000.f) / 32768.f;
+      _model.state.gyro.scale = _gyro ? _gyro->getScale() : Utils::toRad(2000.f) / 32768.f;
 
       _sma.begin(_model.config.loopSync);
       _dyn_notch_denom = std::max((uint32_t)1, _model.state.loopTimer.rate / 1000);

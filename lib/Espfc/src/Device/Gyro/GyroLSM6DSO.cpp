@@ -154,6 +154,11 @@ int GyroLSM6DSO::getRate() const
 
 void GyroLSM6DSO::setRate(int rate) {}
 
+float GyroLSM6DSO::getScale() const
+{
+  return Utils::toRad(0.07f); // 70 mdps/LSB at 2000dps
+}
+
 bool GyroLSM6DSO::testConnection()
 {
   uint8_t whoami = 0;

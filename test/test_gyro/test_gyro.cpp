@@ -70,6 +70,14 @@ void test_lsm6dso_begin_disables_i3c()
   TEST_ASSERT_EQUAL_HEX8(0x02, bus.writeRegs[0x18]);
 }
 
+void test_gyro_scale()
+{
+  GyroICM42688 icm;
+  GyroLSM6DSO lsm;
+  TEST_ASSERT_FLOAT_WITHIN(1e-7f, Utils::toRad(2000.f) / 32768.f, icm.getScale());
+  TEST_ASSERT_FLOAT_WITHIN(1e-7f, Utils::toRad(0.07f), lsm.getScale());
+}
+
 void test_whoami_match()
 {
   MockBusDevice bus;
@@ -251,6 +259,7 @@ int main(int argc, char** argv)
 {
   UNITY_BEGIN();
   RUN_TEST(test_whoami_match);
+  RUN_TEST(test_gyro_scale);
   RUN_TEST(test_lsm6dsm_begin_skips_i3c_disable);
   RUN_TEST(test_lsm6dso_begin_disables_i3c);
   RUN_TEST(test_whoami_mismatch);

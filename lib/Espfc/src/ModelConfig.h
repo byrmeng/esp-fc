@@ -1101,7 +1101,11 @@ public:
   DebugConfig debug;
 
   // not classified yet
+#ifdef ESPFC_I2C_0_SPEED
+  int16_t i2cSpeed = ESPFC_I2C_0_SPEED;
+#else
   int16_t i2cSpeed = 800;
+#endif
   int8_t loopSync = 8; // MPU 1000Hz
   int8_t mixerSync = 1;
   int32_t featureMask = ESPFC_FEATURE_MASK;

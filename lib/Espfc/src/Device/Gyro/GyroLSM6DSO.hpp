@@ -23,6 +23,8 @@ public:
   void setRate(int rate) override;
 
   bool testConnection() override;
+
+  float getScale() const override;
 };
 
 } // namespace Espfc::Device::Gyro

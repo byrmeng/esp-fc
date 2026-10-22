@@ -252,6 +252,27 @@ static IRAM_ATTR bool esp_twi_write_stop(void){
   return true;
 }
 
+// free a slave holding SDA low after an interrupted transfer: clock out its remaining bits, then send STOP
+static IRAM_ATTR void esp_twi_recover(void) {
+  uint32_t i;
+  SDA_HIGH();
+  for (int n = 0; n < 9 && SDA_READ() == 0; n++) {
+    SCL_LOW();
+    esp_twi_delay(esp_twi_dcount);
+    SCL_HIGH();
+    i = 0;
+    while (SCL_READ() == 0 && (i++) < esp_twi_clockStretchLimit); // Clock stretching
+    esp_twi_delay(esp_twi_dcount);
+  }
+  esp_twi_write_stop();
+}
+
+static IRAM_ATTR bool esp_twi_start(void) {
+  if (esp_twi_write_start()) return true;
+  esp_twi_recover();
+  return esp_twi_write_start();
+}
+
 static IRAM_ATTR bool esp_twi_write_bit(bool bit) {
   uint32_t i = 0;
   SCL_LOW();
@@ -295,7 +316,7 @@ static IRAM_ATTR unsigned char esp_twi_read_byte(bool nack) {
 
 unsigned char IRAM_ATTR esp_twi_writeTo(unsigned char address, unsigned char * buf, unsigned int len, unsigned char sendStop){
   unsigned int i;
-  if(!esp_twi_write_start()) return 4;//line busy
+  if(!esp_twi_start()) return 4;//line busy
   if(!esp_twi_write_byte(((address << 1) | 0) & 0xFF)) {
     if (sendStop) esp_twi_write_stop();
     return 2; //received NACK on transmit of address
@@ -319,7 +340,7 @@ unsigned char IRAM_ATTR esp_twi_writeTo(unsigned char address, unsigned char * b
 
 unsigned char IRAM_ATTR esp_twi_readFrom(unsigned char address, unsigned char* buf, unsigned int len, unsigned char sendStop){
   unsigned int i;
-  if(!esp_twi_write_start()) return 4;//line busy
+  if(!esp_twi_start()) return 4;//line busy
   if(!esp_twi_write_byte(((address << 1) | 1) & 0xFF)) {
     if (sendStop) esp_twi_write_stop();
     return 2;//received NACK on transmit of address

@@ -2,6 +2,7 @@
 
 #include "BusAwareDevice.hpp"
 #include "Hal/BusDevice.hpp"
+#include "Utils/Math.hpp"
 #include <helper_3dmath.hpp>
 
 namespace Espfc {
@@ -41,6 +42,12 @@ public:
   virtual void setRate(int rate) = 0;
 
   virtual bool testConnection() = 0;
+
+  // rad/s per LSB
+  virtual float getScale() const
+  {
+    return Utils::toRad(2000.f) / 32768.f;
+  }
 
   static const char** getNames();
   static const char* getName(DeviceType type);
