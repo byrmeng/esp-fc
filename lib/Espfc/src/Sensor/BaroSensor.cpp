@@ -21,6 +21,7 @@ int BaroSensor::begin()
   const float tau = 0.8f;
   _biasAlpha = 1.0f - expf(-dt / tau);
   _model.state.baro.altitudeBiasSamples = 3 * rate;
+  _settleSamples = rate / 2; // let the pressure filter settle before taking the ground bias
 
   reload(MODEL_CHANGE_FILTER);
 
@@ -128,7 +129,14 @@ void BaroSensor::updateAltitude()
   baro.altitudeRaw = Utils::toAltitude(baro.pressure);
   float altitude = baro.altitudeRaw;
 
-  if (baro.altitudeBiasSamples > 0)
+  if (_settleSamples > 0)
+  {
+    // filters start from zero, early samples would skew the bias
+    _settleSamples--;
+    baro.altitudeBias = altitude; // seed, so the average starts close to the ground level
+    baro.altitudePrev = altitude;
+  }
+  else if (baro.altitudeBiasSamples > 0)
   {
     baro.altitudeBiasSamples--;
     baro.altitudeBias += (altitude - baro.altitudeBias) * _biasAlpha;

@@ -8,11 +8,11 @@ namespace Espfc::Device::Baro {
 #define MS5637_CMD_RESET 0x1E
 #define MS5637_CMD_ADC_READ 0x00
 #define MS5637_CMD_PROM_READ 0xA0     // + 2 * word index
-#define MS5637_CMD_CONVERT_D1_4096 0x48 // pressure
+#define MS5637_CMD_CONVERT_D1_8192 0x4A // pressure
 #define MS5637_CMD_CONVERT_D2_2048 0x56 // temperature
 
 // max conversion time + margin [us]
-#define MS5637_DELAY_D1_4096 9000
+#define MS5637_DELAY_D1_8192 17000
 #define MS5637_DELAY_D2_2048 4500
 
 int BaroMS5637::begin(Hal::BusDevice* bus)
@@ -66,13 +66,13 @@ float BaroMS5637::readPressure()
 
 void BaroMS5637::setMode(BaroDeviceMode mode)
 {
-  const uint8_t cmd = mode == BARO_MODE_TEMP ? MS5637_CMD_CONVERT_D2_2048 : MS5637_CMD_CONVERT_D1_4096;
+  const uint8_t cmd = mode == BARO_MODE_TEMP ? MS5637_CMD_CONVERT_D2_2048 : MS5637_CMD_CONVERT_D1_8192;
   _bus->write(_addr, cmd, 0, nullptr);
 }
 
 int BaroMS5637::getDelay(BaroDeviceMode mode) const
 {
-  return mode == BARO_MODE_TEMP ? MS5637_DELAY_D2_2048 : MS5637_DELAY_D1_4096;
+  return mode == BARO_MODE_TEMP ? MS5637_DELAY_D2_2048 : MS5637_DELAY_D1_8192;
 }
 
 bool BaroMS5637::testConnection()

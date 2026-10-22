@@ -342,7 +342,7 @@ void test_baro_ms5637_read_cycle()
   TEST_ASSERT_FLOAT_WITHIN(0.01f, 20.0f, dev.readTemperature());
 
   dev.setMode(BARO_MODE_PRESS);
-  TEST_ASSERT_EQUAL_HEX8(0x48, bus.lastCmd); // convert D1, osr 4096
+  TEST_ASSERT_EQUAL_HEX8(0x4A, bus.lastCmd); // convert D1, osr 8192
   bus.setAdc(6465444);
   TEST_ASSERT_FLOAT_WITHIN(0.5f, 110002.0f, dev.readPressure());
 

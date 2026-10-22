@@ -39,6 +39,7 @@ private:
   uint32_t _wait;
   int32_t _counter;
   float _biasAlpha;
+  int32_t _settleSamples;
   bool _first{true};
 };
 
