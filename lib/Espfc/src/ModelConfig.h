@@ -824,7 +824,11 @@ struct AccelConfig
 struct BaroConfig
 {
   int8_t bus = Hal::BUS_AUTO;
+#ifdef ESPFC_BARO_DEV
+  int8_t dev = ESPFC_BARO_DEV;
+#else
   int8_t dev = BARO_NONE;
+#endif
   FilterConfig filter{FILTER_BIQUAD, 3};
 };
 

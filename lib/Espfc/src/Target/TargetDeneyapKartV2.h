@@ -85,6 +85,8 @@
 
 #define ESPFC_BOARD_ALIGN_YAW 270
 
+#define ESPFC_BARO_DEV BARO_DEFAULT // auto detect, e.g. Deneyap pressure module (MS5637)
+
 #define ESPFC_WIFI_AP_SSID_PREFIX "DeneyapFC"
 #define ESPFC_WIFI_AP_PASS "deneyapfc"
 
