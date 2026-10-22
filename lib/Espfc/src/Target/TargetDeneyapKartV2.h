@@ -89,6 +89,7 @@
 #define ESPFC_WIFI_AP_PASS "deneyapfc"
 
 #define ESPFC_GYRO_I2C_RATE_MAX 1000
+#define ESPFC_GYRO_BIAS_TRACKING // no mag, follow thermal gyro drift while disarmed
 #define ESPFC_GYRO_SPI_RATE_MAX 4000
 
 #define ESPFC_DSHOT_TELEMETRY

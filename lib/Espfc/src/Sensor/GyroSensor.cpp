@@ -28,6 +28,9 @@ int GyroSensor::begin()
   _model.state.gyro.calibrationState = CALIBRATION_START; // calibrate gyro on start
   _model.state.gyro.calibrationRate = _model.state.loopTimer.rate;
   _model.state.gyro.biasAlpha = 5.0f / _model.state.gyro.calibrationRate;
+#ifdef ESPFC_GYRO_BIAS_TRACKING
+  _biasTracker.begin(_model.state.gyro.calibrationRate);
+#endif
 
   _model.logger.info()
       .log("GYRO INIT")
@@ -344,9 +347,16 @@ void FAST_CODE_ATTR GyroSensor::calibrate()
 {
   switch (_model.state.gyro.calibrationState)
   {
-    case CALIBRATION_IDLE:
+    case CALIBRATION_IDLE: {
+#ifdef ESPFC_GYRO_BIAS_TRACKING
+      auto accel = _model.state.accel.adc.fetch();
+      const float accelDelta = (accel - _model.state.accel.prev).getMagnitude();
+      _model.state.accel.prev = accel;
+      _biasTracker.update(_model.state.gyro.bias, _model.state.gyro.adc, accelDelta, _model.isModeActive(MODE_ARMED));
+#endif
       _model.state.gyro.adc -= _model.state.gyro.bias;
-      break;
+    }
+    break;
     case CALIBRATION_START:
       //_model.state.gyro.bias = VectorFloat();
       _model.state.gyro.biasSamples = 2 * _model.state.gyro.calibrationRate;

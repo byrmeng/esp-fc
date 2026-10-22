@@ -4,6 +4,7 @@
 #include "Hal/Platform.hpp"
 #include "Model.h"
 #include "Sensor/BaseSensor.hpp"
+#include "Sensor/GyroBiasTracker.hpp"
 #include "Utils/Sma.hpp"
 #ifdef ESPFC_HAL_DSP
 #include "Utils/FFTAnalyzer.hpp"
@@ -49,6 +50,9 @@ private:
 
   Model& _model;
   Device::GyroDevice* _gyro;
+#ifdef ESPFC_GYRO_BIAS_TRACKING
+  GyroBiasTracker _biasTracker;
+#endif
 
 #ifdef ESPFC_HAL_DSP
   Utils::FFTAnalyzer _fft[3];
