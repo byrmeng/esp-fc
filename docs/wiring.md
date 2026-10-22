@@ -19,7 +19,7 @@ Tu unmap pin function use -1 as pin number
 | SDA/SDI    | `pin_i2c_sda`    | 21    | 9        |
 
 > [!NOTE]
-> I2C driver accepts only pins from 1 to 31
+> On ESP32-C3 and RP2040 I2C driver accepts only pins from 1 to 31, on ESP8266 from 1 to 15
 
 ## Default SPI pin mapping gyro modules
 
@@ -85,6 +85,8 @@ Build with `pio run -e deneyap_kart_v2`. Board labels are given in brackets.
 
 | Function       | CLI name             | GPIO | Board label |
 |----------------|----------------------|-----:|-------------|
+| I2C SDA (imu)  | `pin_i2c_sda`        | 47   | SDA         |
+| I2C SCL (imu)  | `pin_i2c_scl`        | 21   | SCL         |
 | Gyro SCK       | `pin_spi_0_sck`      | 41   | SCK         |
 | Gyro MOSI      | `pin_spi_0_mosi`     | 39   | MO          |
 | Gyro MISO      | `pin_spi_0_miso`     | 40   | MI          |
@@ -100,8 +102,6 @@ Build with `pio run -e deneyap_kart_v2`. Board labels are given in brackets.
 | UART 2 TX      | `pin_serial_1_tx`    | 1    | D0          |
 | UART 3 RX      | `pin_serial_2_rx`    | 11   | D12         |
 | UART 3 TX      | `pin_serial_2_tx`    | 10   | D13         |
-| I2C SDA        | `pin_i2c_sda`        | 8    | D15         |
-| I2C SCL        | `pin_i2c_scl`        | 9    | D14         |
 | Voltage        | `pin_input_adc_vbat` | 4    | A0          |
 | Current        | `pin_input_adc_ibat` | 5    | A1          |
 | PPM            | `pin_input_rx`       | 7    | D20         |
@@ -110,8 +110,8 @@ Build with `pio run -e deneyap_kart_v2`. Board labels are given in brackets.
 | Button         | `pin_button`         | 0    | BOOT key    |
 
 > [!NOTE]
-> The board has no onboard gyro, use an external SPI module (ICM-42688-P, BMI160, MPU-6500, ...).
-> The board I2C header (SDA=47, SCL=21) cannot be used, because I2C driver accepts only pins from 1 to 31.
+> The board has onboard LSM6DSM imu on I2C bus (address 0x6A), it is detected as `LSM6DSO`.
+> Optional external SPI gyro (ICM-42688-P, BMI160, MPU-6500, ...) on SPI header takes precedence over onboard imu.
 > GPIO 12, 13, 14 are reserved for the onboard microSD slot.
 
 ## Example ESP32 SPI MPU-6500/MPU-9250 gyro

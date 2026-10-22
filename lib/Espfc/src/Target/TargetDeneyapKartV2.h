@@ -52,7 +52,7 @@
 #define ESPFC_SERIAL_REMAP_PINS
 #define ESPFC_SERIAL_DEBUG_PORT SERIAL_USB
 
-// board SPI header (SCK/MO/MI/SS)
+// board SPI header (SCK/MO/MI/SS), optional external gyro
 #define ESPFC_SPI_0
 #define ESPFC_SPI_0_SCK 41
 #define ESPFC_SPI_0_MOSI 39
@@ -61,10 +61,10 @@
 #define ESPFC_SPI_CS_GYRO 42 // SS
 #define ESPFC_SPI_CS_BARO 38 // D8
 
-// board I2C header uses SDA=47, which software I2C driver does not support (pins 0-31 only)
+// board I2C header, shared with onboard LSM6DSM imu (0x6A)
 #define ESPFC_I2C_0
-#define ESPFC_I2C_0_SCL 9 // D14
-#define ESPFC_I2C_0_SDA 8 // D15
+#define ESPFC_I2C_0_SCL 21
+#define ESPFC_I2C_0_SDA 47
 #define ESPFC_I2C_0_SOFT
 
 #define ESPFC_BUZZER_PIN 48 // D9

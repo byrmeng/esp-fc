@@ -23,6 +23,11 @@
 #define LSM6DSO_REG_OUTX_L_G 0x22
 #define LSM6DSO_REG_OUTX_L_XL 0x28
 
+// chip ids
+#define LSM6DSO_WHO_AM_I 0x6C
+#define LSM6DS3_WHO_AM_I 0x69
+#define LSM6DSM_WHO_AM_I 0x6A // register compatible, except CTRL9_XL (no I3C)
+
 // values
 #define LSM6DSO_VAL_INT1_CTRL 0x02        // enable gyro data ready interrupt pin 1
 #define LSM6DSO_VAL_INT2_CTRL 0x02        // enable gyro data ready interrupt pin 2
@@ -101,7 +106,10 @@ int GyroLSM6DSO::begin(Hal::BusDevice* bus, uint8_t addr)
                   (LSM6DSO_VAL_CTRL6_C_XL_HM_MODE | LSM6DSO_VAL_CTRL6_C_FTYPE_335HZ));
 
   // disable I3C interface
-  _bus->writeMask(_addr, LSM6DSO_REG_CTRL9_XL, LSM6DSO_MASK_CTRL9_XL, LSM6DSO_VAL_CTRL9_XL_I3C_DISABLE);
+  if (getChipId() != LSM6DSM_WHO_AM_I)
+  {
+    _bus->writeMask(_addr, LSM6DSO_REG_CTRL9_XL, LSM6DSO_MASK_CTRL9_XL, LSM6DSO_VAL_CTRL9_XL_I3C_DISABLE);
+  }
 
   return 1;
 }
@@ -151,7 +159,7 @@ bool GyroLSM6DSO::testConnection()
   uint8_t whoami = 0;
   if (_bus->readByte(_addr, LSM6DSO_REG_WHO_AM_I, &whoami) != 1) return false;
   setChipId(whoami);
-  return whoami == 0x6C || whoami == 0x69;
+  return whoami == LSM6DSO_WHO_AM_I || whoami == LSM6DS3_WHO_AM_I || whoami == LSM6DSM_WHO_AM_I;
 }
 
 } // namespace Espfc::Device::Gyro

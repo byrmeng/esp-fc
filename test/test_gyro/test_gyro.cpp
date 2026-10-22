@@ -1,5 +1,6 @@
 #include "Device/Baro/BaroBMP280.hpp"
 #include "Device/Gyro/GyroICM42688.hpp"
+#include "Device/Gyro/GyroLSM6DSO.hpp"
 #include "Device/GyroDevice.hpp"
 #include "Device/Mag/MagHMC5883L.hpp"
 #include <ArduinoFake.h>
@@ -47,6 +48,27 @@ public:
     return true;
   }
 };
+
+void test_lsm6dsm_begin_skips_i3c_disable()
+{
+  fakeit::When(Method(ArduinoFake(), delay)).AlwaysReturn();
+  MockBusDevice bus;
+  bus.readRegs[0x0F] = 0x6A;
+  GyroLSM6DSO dev;
+  TEST_ASSERT_EQUAL_INT(1, dev.begin(&bus, 0x6A));
+  TEST_ASSERT_EQUAL_HEX8(0x00, bus.writeRegs[0x18]);
+  TEST_ASSERT_EQUAL_HEX8(0xAC, bus.writeRegs[0x11]); // gyro 6664hz, 2000dps
+}
+
+void test_lsm6dso_begin_disables_i3c()
+{
+  fakeit::When(Method(ArduinoFake(), delay)).AlwaysReturn();
+  MockBusDevice bus;
+  bus.readRegs[0x0F] = 0x6C;
+  GyroLSM6DSO dev;
+  TEST_ASSERT_EQUAL_INT(1, dev.begin(&bus, 0x6A));
+  TEST_ASSERT_EQUAL_HEX8(0x02, bus.writeRegs[0x18]);
+}
 
 void test_whoami_match()
 {
@@ -229,6 +251,8 @@ int main(int argc, char** argv)
 {
   UNITY_BEGIN();
   RUN_TEST(test_whoami_match);
+  RUN_TEST(test_lsm6dsm_begin_skips_i3c_disable);
+  RUN_TEST(test_lsm6dso_begin_disables_i3c);
   RUN_TEST(test_whoami_mismatch);
   RUN_TEST(test_chip_id_is_empty_before_connection);
   RUN_TEST(test_chip_id_cached_on_success);

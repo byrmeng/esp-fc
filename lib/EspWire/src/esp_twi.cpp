@@ -44,13 +44,28 @@ static uint32_t esp_twi_clockStretchLimit;
   #define SCL_HIGH()  (GPIO.enable_w1tc.enable_w1tc = ((uint32_t) 1 << esp_twi_scl))
   #define SCL_READ()  ((GPIO.in.val & ((uint32_t) 1 << esp_twi_scl)) != 0)
 #elif defined(ESP32)
-  //#define SDA_LOW()   (GPIO.enable_w1ts = (1 << esp_twi_sda)) //Enable SDA (becomes output and since GPO is 0 for the pin, it will pull the line low)
-  static inline void SDA_LOW() { GPIO.enable_w1ts = 1 << esp_twi_sda; GPIO.out_w1tc = 1 << esp_twi_sda; }
-  #define SDA_HIGH()  (GPIO.enable_w1tc = (1 << esp_twi_sda)) //Disable SDA (becomes input and since it has pullup it will go high)
-  #define SDA_READ()  ((GPIO.in & (1 << esp_twi_sda)) != 0)
-  #define SCL_LOW()   (GPIO.enable_w1ts = (1 << esp_twi_scl))
-  #define SCL_HIGH()  (GPIO.enable_w1tc = (1 << esp_twi_scl))
-  #define SCL_READ()  ((GPIO.in & (1 << esp_twi_scl)) != 0)
+  // pins 32+ live in the second GPIO register bank
+  struct esp_twi_pin_t {
+    volatile uint32_t* enable_w1ts;
+    volatile uint32_t* enable_w1tc;
+    volatile uint32_t* out_w1tc;
+    volatile uint32_t* in;
+    uint32_t mask;
+  };
+  static esp_twi_pin_t esp_twi_sda_pin, esp_twi_scl_pin;
+  static void esp_twi_pin_init(esp_twi_pin_t& p, unsigned char pin) {
+    if (pin < 32) {
+      p = { &GPIO.enable_w1ts, &GPIO.enable_w1tc, &GPIO.out_w1tc, &GPIO.in, 1u << pin };
+    } else {
+      p = { &GPIO.enable1_w1ts.val, &GPIO.enable1_w1tc.val, &GPIO.out1_w1tc.val, &GPIO.in1.val, 1u << (pin - 32) };
+    }
+  }
+  static inline void SDA_LOW() { *esp_twi_sda_pin.enable_w1ts = esp_twi_sda_pin.mask; *esp_twi_sda_pin.out_w1tc = esp_twi_sda_pin.mask; } //Enable SDA (becomes output and since GPO is 0 for the pin, it will pull the line low)
+  #define SDA_HIGH()  (*esp_twi_sda_pin.enable_w1tc = esp_twi_sda_pin.mask) //Disable SDA (becomes input and since it has pullup it will go high)
+  #define SDA_READ()  ((*esp_twi_sda_pin.in & esp_twi_sda_pin.mask) != 0)
+  #define SCL_LOW()   (*esp_twi_scl_pin.enable_w1ts = esp_twi_scl_pin.mask)
+  #define SCL_HIGH()  (*esp_twi_scl_pin.enable_w1tc = esp_twi_scl_pin.mask)
+  #define SCL_READ()  ((*esp_twi_scl_pin.in & esp_twi_scl_pin.mask) != 0)
 #elif defined(ARCH_RP2040)
   #define SDA_LOW()   (pinMode(esp_twi_sda, OUTPUT)) //Enable SDA (becomes output and since GPO is 0 for the pin, it will pull the line low)
   #define SDA_HIGH()  (pinMode(esp_twi_sda, INPUT_PULLUP))  //Disable SDA (becomes input and since it has pullup it will go high)
@@ -91,7 +106,9 @@ static uint32_t esp_twi_clockStretchLimit;
 #define TWI_CLOCK_STRETCH_MULTIPLIER 6
 #endif
 
-#if defined(ESP32) || defined(ARCH_RP2040)
+#if defined(ESP32) && !defined(ESP32C3)
+#define TWI_PIN_MAX (SOC_GPIO_PIN_COUNT - 1)
+#elif defined(ESP32) || defined(ARCH_RP2040)
 #define TWI_PIN_MAX 32
 #else
 #define TWI_PIN_MAX 15
@@ -167,6 +184,10 @@ void esp_twi_init(unsigned char sda, unsigned char scl){
   if(sda > TWI_PIN_MAX || scl > TWI_PIN_MAX) return;
   esp_twi_sda = sda;
   esp_twi_scl = scl;
+#if defined(ESP32) && !defined(ESP32C3)
+  esp_twi_pin_init(esp_twi_sda_pin, sda);
+  esp_twi_pin_init(esp_twi_scl_pin, scl);
+#endif
   pinMode(esp_twi_sda, INPUT_PULLUP);
   pinMode(esp_twi_scl, INPUT_PULLUP);
   esp_twi_setClock(100000);
