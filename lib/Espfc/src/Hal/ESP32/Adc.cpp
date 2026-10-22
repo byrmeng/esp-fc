@@ -1,6 +1,7 @@
 #if defined(ESP32)
 
 #include "Hal/Adc.hpp"
+#include "Target/Target.h"
 #include <Arduino.h>
 
 namespace Espfc::Hal {
