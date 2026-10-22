@@ -1,0 +1,88 @@
+#pragma once
+
+// Deneyap Kart v2 (ESP32-S3, 8MB flash, OPI PSRAM)
+#define ESPFC_BOARD_NAME "DENEYAP_KART_V2"
+#define ESPFC_MANUFACTURER_ID "DNYP"
+
+// pins to avoid:
+// strapping: 0, 3, 45, 46 (0 is BOOT key, 46 is onboard WS2812)
+// flash/psram: 26-37 (reserved)
+// usb/jtag: 19, 20
+// sd card: 12, 13, 14 (onboard microSD slot)
+
+#define ESPFC_INPUT
+#define ESPFC_INPUT_PIN 7 // ppm, D20
+
+#define ESPFC_OUTPUT_COUNT 4
+#define ESPFC_OUTPUT_0 15 // D19
+#define ESPFC_OUTPUT_1 16 // D18
+#define ESPFC_OUTPUT_2 17 // D17
+#define ESPFC_OUTPUT_3 18 // D16
+
+// board TX/RX header, receiver
+#define ESPFC_SERIAL_0
+#define ESPFC_SERIAL_0_TX 43
+#define ESPFC_SERIAL_0_RX 44
+#define ESPFC_SERIAL_0_FN (SERIAL_FUNCTION_RX_SERIAL)
+#define ESPFC_SERIAL_0_BAUD (SERIAL_SPEED_115200)
+#define ESPFC_SERIAL_0_BBAUD (SERIAL_SPEED_NONE)
+
+#define ESPFC_SERIAL_1
+#define ESPFC_SERIAL_1_TX 1 // D0
+#define ESPFC_SERIAL_1_RX 2 // D1
+#define ESPFC_SERIAL_1_FN (SERIAL_FUNCTION_MSP)
+#define ESPFC_SERIAL_1_BAUD (SERIAL_SPEED_115200)
+#define ESPFC_SERIAL_1_BBAUD (SERIAL_SPEED_NONE)
+
+#define ESPFC_SERIAL_2
+#define ESPFC_SERIAL_2_TX 10 // D13
+#define ESPFC_SERIAL_2_RX 11 // D12
+#define ESPFC_SERIAL_2_FN (SERIAL_FUNCTION_MSP)
+#define ESPFC_SERIAL_2_BAUD (SERIAL_SPEED_115200)
+#define ESPFC_SERIAL_2_BBAUD (SERIAL_SPEED_NONE)
+
+#define ESPFC_SERIAL_USB
+#define ESPFC_SERIAL_USB_FN (SERIAL_FUNCTION_MSP)
+#define ESPFC_SERIAL_USB_REENUMERATE
+
+#define ESPFC_SERIAL_SOFT_0
+#define ESPFC_SERIAL_SOFT_0_FN (SERIAL_FUNCTION_MSP)
+#define ESPFC_SERIAL_SOFT_0_WIFI
+
+#define ESPFC_SERIAL_REMAP_PINS
+#define ESPFC_SERIAL_DEBUG_PORT SERIAL_USB
+
+// board SPI header (SCK/MO/MI/SS)
+#define ESPFC_SPI_0
+#define ESPFC_SPI_0_SCK 41
+#define ESPFC_SPI_0_MOSI 39
+#define ESPFC_SPI_0_MISO 40
+
+#define ESPFC_SPI_CS_GYRO 42 // SS
+#define ESPFC_SPI_CS_BARO 38 // D8
+
+// board I2C header uses SDA=47, which software I2C driver does not support (pins 0-31 only)
+#define ESPFC_I2C_0
+#define ESPFC_I2C_0_SCL 9 // D14
+#define ESPFC_I2C_0_SDA 8 // D15
+#define ESPFC_I2C_0_SOFT
+
+#define ESPFC_BUZZER_PIN 48 // D9
+#define ESPFC_BUTTON_PIN 0  // BOOT key
+#define ESPFC_LED_PIN 46    // onboard WS2812
+#define ESPFC_LED_TYPE 1    // LED_STRIP
+
+#define ESPFC_ADC_VBAT
+#define ESPFC_ADC_VBAT_PIN 4 // A0
+
+#define ESPFC_ADC_IBAT
+#define ESPFC_ADC_IBAT_PIN 5 // A1
+
+#define ESPFC_ADC_SCALE (3.3f / 4096)
+
+#define ESPFC_FEATURE_MASK (FEATURE_RX_SERIAL)
+
+#define ESPFC_GYRO_I2C_RATE_MAX 2000
+#define ESPFC_GYRO_SPI_RATE_MAX 4000
+
+#define ESPFC_DSHOT_TELEMETRY

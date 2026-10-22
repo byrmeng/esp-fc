@@ -214,6 +214,25 @@ public:
     return false;
   }
 
+  void resetDisarmedOutputs()
+  {
+    for (size_t i = 0; i < OUTPUT_CHANNELS; i++)
+    {
+      state.output.disarmed[i] =
+          config.output.channel[i].servo ? config.output.channel[i].neutral : config.output.minCommand; // ROBOT
+    }
+  }
+
+  // stop motor test when MSP host goes silent, e.g. cable or app disconnected
+  void updateMotorTestTimeout(uint32_t nowMs)
+  {
+    if (!areMotorsRunning()) return;
+    if (nowMs - state.output.mspActivityTime < MOTOR_TEST_TIMEOUT_MS) return;
+    resetDisarmedOutputs();
+  }
+
+  static constexpr uint32_t MOTOR_TEST_TIMEOUT_MS = 1000;
+
   void inline setDebug(DebugMode mode, size_t index, int16_t value)
   {
     if (index >= 8) return;
@@ -566,11 +585,7 @@ public:
     }
 
     // ensure disarmed pulses
-    for (size_t i = 0; i < OUTPUT_CHANNELS; i++)
-    {
-      state.output.disarmed[i] =
-          config.output.channel[i].servo ? config.output.channel[i].neutral : config.output.minCommand; // ROBOT
-    }
+    resetDisarmedOutputs();
 
     state.buzzer.beeperMask = config.buzzer.beeperMask;
 

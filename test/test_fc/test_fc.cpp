@@ -663,6 +663,42 @@ void test_mixer_output_limit_servo()
   TEST_ASSERT_FLOAT_WITHIN(0.001f, 0.8f, mixer.limitOutput(1.0f, servo, 80));
 }
 
+void test_model_motor_test_timeout()
+{
+  Model model;
+  model.state.currentMixer.count = 4;
+  model.resetDisarmedOutputs();
+  model.state.output.disarmed[0] = 1200;
+  model.state.output.mspActivityTime = 5000;
+
+  model.updateMotorTestTimeout(5999);
+  TEST_ASSERT_EQUAL_INT16(1200, model.state.output.disarmed[0]);
+  TEST_ASSERT_TRUE(model.areMotorsRunning());
+
+  model.updateMotorTestTimeout(6000);
+  TEST_ASSERT_EQUAL_INT16(1000, model.state.output.disarmed[0]);
+  TEST_ASSERT_FALSE(model.areMotorsRunning());
+}
+
+void test_actuator_arming_msp_motor_test()
+{
+  Model model;
+  model.state.gyro.present = true;
+  model.config.output.protocol = ESC_PROTOCOL_DSHOT150;
+  model.state.currentMixer.count = 4;
+  model.resetDisarmedOutputs();
+  model.state.output.disarmed[2] = 1100;
+
+  Actuator actuator(model);
+  actuator.begin();
+  actuator.updateArmingDisabled();
+  TEST_ASSERT_EQUAL_UINT32(ARMING_DISABLED_MSP, model.state.mode.armingDisabledFlags);
+
+  model.resetDisarmedOutputs();
+  actuator.updateArmingDisabled();
+  TEST_ASSERT_EQUAL_UINT32(0, model.state.mode.armingDisabledFlags);
+}
+
 int main(int argc, char** argv)
 {
   UNITY_BEGIN();
@@ -686,6 +722,8 @@ int main(int argc, char** argv)
   RUN_TEST(test_rates_kiss_expo);
   RUN_TEST(test_actuator_arming_gyro_motor_calbration);
   RUN_TEST(test_actuator_arming_failsafe);
+  RUN_TEST(test_actuator_arming_msp_motor_test);
+  RUN_TEST(test_model_motor_test_timeout);
   RUN_TEST(test_actuator_arming_throttle);
   RUN_TEST(test_mixer_throttle_limit_none);
   RUN_TEST(test_mixer_throttle_limit_scale);

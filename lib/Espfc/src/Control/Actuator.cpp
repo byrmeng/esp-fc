@@ -94,6 +94,7 @@ void Actuator::updateArmingDisabled()
   _model.setArmingDisabled(ARMING_DISABLED_CALIBRATING, _model.calibrationActive());
   _model.setArmingDisabled(ARMING_DISABLED_MOTOR_PROTOCOL, _model.config.output.protocol == ESC_PROTOCOL_DISABLED);
   _model.setArmingDisabled(ARMING_DISABLED_REBOOT_REQUIRED, _model.state.mode.rescueConfigMode == RESCUE_CONFIG_ACTIVE);
+  _model.setArmingDisabled(ARMING_DISABLED_MSP, _model.areMotorsRunning());
 
   // Check small angle - prevent arming if tilted beyond configured angle
   if (_model.config.arming.smallAngle < 180.0f && _model.accelActive())

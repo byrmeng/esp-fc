@@ -2,6 +2,7 @@
 #include "Debug_Espfc.h"
 #include "Device/SerialDeviceAdapter.h"
 #include "Hal/FastCode.hpp"
+#include "Hal/Time.hpp"
 #include "Stream/Printer.hpp"
 #if defined(ESPFC_SERIAL_USB_REENUMERATE) && defined(ESPFC_SERIAL_USB)
 #include "Hal/Board.hpp"
@@ -170,6 +171,8 @@ int SerialManager::reload(ModelChangeEvent event)
 
 int FAST_CODE_ATTR SerialManager::update()
 {
+  _model.updateMotorTestTimeout(millis());
+
   const SerialPortConfig& sc = _model.config.serial[_current];
   SerialPortState& ss = _model.state.serial[_current];
 
@@ -238,6 +241,7 @@ void SerialManager::processMsp(SerialPortState& ss)
     {
       if (ss.mspRequest.isReady() && ss.mspRequest.isCmd())
       {
+        _model.state.output.mspActivityTime = millis();
         _msp.processCommand(ss.mspRequest, ss.mspResponse, *ss.stream);
         _msp.sendResponse(ss.mspResponse, *ss.stream);
         _msp.postCommand();

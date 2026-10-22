@@ -168,8 +168,15 @@ void MspProcessor::processCommand(MspMessage& m, MspResponse& r, Stream::ReadWri
       }
       r.writeU8(std::strlen(targetName)); // target name
       r.writeData(targetName, std::strlen(targetName));
+#if defined(ESPFC_BOARD_NAME) && defined(ESPFC_MANUFACTURER_ID)
+      r.writeU8(std::strlen(ESPFC_BOARD_NAME));
+      r.writeData(ESPFC_BOARD_NAME, std::strlen(ESPFC_BOARD_NAME));
+      r.writeU8(std::strlen(ESPFC_MANUFACTURER_ID));
+      r.writeData(ESPFC_MANUFACTURER_ID, std::strlen(ESPFC_MANUFACTURER_ID));
+#else
       r.writeU8(0); // board name
       r.writeU8(0); // manufacturer name
+#endif
       for (size_t i = 0; i < 32; i++)
       {
         r.writeU8(0); // signature
@@ -1731,6 +1738,11 @@ void MspProcessor::processCommand(MspMessage& m, MspResponse& r, Stream::ReadWri
       break;
 
     case MSP_SET_MOTOR:
+      if (_model.isModeActive(MODE_ARMED))
+      {
+        r.result = -1;
+        break;
+      }
       if (_model.isFeatureActive(FEATURE_GPS) && _model.config.blackbox.mode > 0)
       {
         _model.setGpsHome(true);

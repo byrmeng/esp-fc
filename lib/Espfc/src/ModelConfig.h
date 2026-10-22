@@ -906,7 +906,11 @@ struct GpsConfig
 struct LedConfig
 {
   uint8_t invert = 0;
+#ifdef ESPFC_LED_TYPE
+  int8_t type = ESPFC_LED_TYPE;
+#else
   int8_t type = 0;
+#endif
 };
 
 struct ArmingConfig

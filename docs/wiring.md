@@ -79,6 +79,41 @@ Tu unmap pin function use -1 as pin number
 | `pin_buzzer`        |  0    | 5        | Status buzzer |
 | `pin_led`           |  26   | -        | Status led    |
 
+## Deneyap Kart v2 pin mapping
+
+Build with `pio run -e deneyap_kart_v2`. Board labels are given in brackets.
+
+| Function       | CLI name             | GPIO | Board label |
+|----------------|----------------------|-----:|-------------|
+| Gyro SCK       | `pin_spi_0_sck`      | 41   | SCK         |
+| Gyro MOSI      | `pin_spi_0_mosi`     | 39   | MO          |
+| Gyro MISO      | `pin_spi_0_miso`     | 40   | MI          |
+| Gyro CS        | `pin_spi_cs_0`       | 42   | SS          |
+| Baro CS        | `pin_spi_cs_1`       | 38   | D8          |
+| Motor 1        | `pin_output_0`       | 15   | D19         |
+| Motor 2        | `pin_output_1`       | 16   | D18         |
+| Motor 3        | `pin_output_2`       | 17   | D17         |
+| Motor 4        | `pin_output_3`       | 18   | D16         |
+| Receiver RX    | `pin_serial_0_rx`    | 44   | RX          |
+| Receiver TX    | `pin_serial_0_tx`    | 43   | TX          |
+| UART 2 RX      | `pin_serial_1_rx`    | 2    | D1          |
+| UART 2 TX      | `pin_serial_1_tx`    | 1    | D0          |
+| UART 3 RX      | `pin_serial_2_rx`    | 11   | D12         |
+| UART 3 TX      | `pin_serial_2_tx`    | 10   | D13         |
+| I2C SDA        | `pin_i2c_sda`        | 8    | D15         |
+| I2C SCL        | `pin_i2c_scl`        | 9    | D14         |
+| Voltage        | `pin_input_adc_vbat` | 4    | A0          |
+| Current        | `pin_input_adc_ibat` | 5    | A1          |
+| PPM            | `pin_input_rx`       | 7    | D20         |
+| Buzzer         | `pin_buzzer`         | 48   | D9          |
+| Status led     | `pin_led`            | 46   | onboard RGB |
+| Button         | `pin_button`         | 0    | BOOT key    |
+
+> [!NOTE]
+> The board has no onboard gyro, use an external SPI module (ICM-42688-P, BMI160, MPU-6500, ...).
+> The board I2C header (SDA=47, SCL=21) cannot be used, because I2C driver accepts only pins from 1 to 31.
+> GPIO 12, 13, 14 are reserved for the onboard microSD slot.
+
 ## Example ESP32 SPI MPU-6500/MPU-9250 gyro
 
 ![ESP-FC ESP32 SPI Wiring](./images/esp-fc-esp32_spi_wiring.png)
