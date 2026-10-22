@@ -361,6 +361,7 @@ void FAST_CODE_ATTR GyroSensor::calibrate()
       //_model.state.gyro.bias = VectorFloat();
       _model.state.gyro.biasSamples = 2 * _model.state.gyro.calibrationRate;
       _model.state.gyro.calibrationState = CALIBRATION_UPDATE;
+      _model.state.gyro.adc -= _model.state.gyro.bias;
       break;
     case CALIBRATION_UPDATE: {
       auto accel = _model.state.accel.adc.fetch();
@@ -372,13 +373,17 @@ void FAST_CODE_ATTR GyroSensor::calibrate()
         _model.state.gyro.bias += (_model.state.gyro.adc - _model.state.gyro.bias) * _model.state.gyro.biasAlpha;
         _model.state.gyro.biasSamples--;
       }
+      // keep using the current bias meanwhile, raw gyro makes the attitude drift until the board is held still
+      _model.state.gyro.adc -= _model.state.gyro.bias;
       if (_model.state.gyro.biasSamples <= 0) _model.state.gyro.calibrationState = CALIBRATION_APPLY;
     }
     break;
     case CALIBRATION_APPLY:
+      _model.state.gyro.adc -= _model.state.gyro.bias;
       _model.state.gyro.calibrationState = CALIBRATION_SAVE;
       break;
     case CALIBRATION_SAVE:
+      _model.state.gyro.adc -= _model.state.gyro.bias;
       _model.finishCalibration();
       _model.state.gyro.calibrationState = CALIBRATION_IDLE;
       break;
