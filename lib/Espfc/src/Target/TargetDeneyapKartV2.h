@@ -86,6 +86,7 @@
 #define ESPFC_BOARD_ALIGN_YAW 270
 
 #define ESPFC_BARO_DEV BARO_DEFAULT // auto detect, e.g. Deneyap pressure module (MS5637)
+#define ESPFC_BARO_LPF_FREQ 1       // altitude is only displayed, halves noise vs 5 Hz (sd ~0.1 m on MS5637)
 
 #define ESPFC_WIFI_AP_SSID_PREFIX "DeneyapFC"
 #define ESPFC_WIFI_AP_PASS "deneyapfc"
