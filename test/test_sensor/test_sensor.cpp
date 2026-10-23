@@ -1,5 +1,6 @@
 #include "Sensor/VoltageSensor.hpp"
 #include "Sensor/GyroBiasTracker.hpp"
+#include "Sensor/StillDetector.hpp"
 #include <ArduinoFake.h>
 #include <platform.h>
 #include <unity.h>
@@ -130,6 +131,27 @@ void test_gyro_bias_tracker_motion_restarts_hold()
   TEST_ASSERT_TRUE(tracker.update(bias, still, 0.0f, false));
 }
 
+void test_still_detector_accepts_resting_board()
+{
+  VectorFloat accel(0.3f, -0.2f, ACCEL_G);
+  const VectorFloat prev = accel + VectorFloat(0.0f, 0.0f, 0.01f);
+  TEST_ASSERT_TRUE(StillDetector::isStill(accel, prev, VectorFloat(0.01f, 0.0f, 0.0f), ACCEL_G));
+  // tilted board still counts, level is defined by the user
+  const VectorFloat tilted(0.0f, ACCEL_G * 0.5f, ACCEL_G * 0.866f);
+  TEST_ASSERT_TRUE(StillDetector::isStill(tilted, tilted, VectorFloat(), ACCEL_G));
+}
+
+void test_still_detector_rejects_motion()
+{
+  VectorFloat accel(0.0f, 0.0f, ACCEL_G);
+  TEST_ASSERT_FALSE(StillDetector::isStill(accel, accel + VectorFloat(0.1f, 0.0f, 0.0f), VectorFloat(), ACCEL_G)); // shaking
+  TEST_ASSERT_FALSE(StillDetector::isStill(accel, accel, VectorFloat(0.0f, 0.0f, 0.2f), ACCEL_G));                // turning
+  const VectorFloat pushed(0.0f, 0.0f, ACCEL_G + 2.0f);
+  TEST_ASSERT_FALSE(StillDetector::isStill(pushed, pushed, VectorFloat(), ACCEL_G)); // steady vertical acceleration
+  const VectorFloat falling(0.0f, 0.0f, ACCEL_G * 0.8f);
+  TEST_ASSERT_FALSE(StillDetector::isStill(falling, falling, VectorFloat(), ACCEL_G));
+}
+
 int main(int argc, char** argv)
 {
   UNITY_BEGIN();
@@ -140,6 +162,8 @@ int main(int argc, char** argv)
   RUN_TEST(test_gyro_bias_tracker_follows_drift);
   RUN_TEST(test_gyro_bias_tracker_ignores_motion_and_armed);
   RUN_TEST(test_gyro_bias_tracker_motion_restarts_hold);
+  RUN_TEST(test_still_detector_accepts_resting_board);
+  RUN_TEST(test_still_detector_rejects_motion);
 
   return UNITY_END();
 }

@@ -1,5 +1,6 @@
 #include "Sensor/AccelSensor.hpp"
 #include "Hal/FastCode.hpp"
+#include "Sensor/StillDetector.hpp"
 
 namespace Espfc::Sensor {
 
@@ -130,23 +131,38 @@ void FAST_CODE_ATTR AccelSensor::calibrate(VectorFloat& accel)
       accel -= _model.state.accel.bias;
       break;
     case CALIBRATION_START:
-      _model.state.accel.bias = VectorFloat(0, 0, ACCEL_G);
+      _calibrationBias = VectorFloat(0, 0, ACCEL_G);
+      _prev = accel;
       _model.state.accel.biasSamples = 2 * _model.state.accel.timer.rate;
       _model.state.accel.calibrationState = CALIBRATION_UPDATE;
+      accel -= _model.state.accel.bias;
       break;
     case CALIBRATION_UPDATE:
-      _model.state.accel.bias += (accel - _model.state.accel.bias) * _model.state.accel.biasAlpha;
-      _model.state.accel.biasSamples--;
+      // only a continuous still period counts, a sample taken in hand would tilt the level reference
+      if (StillDetector::isStill(accel, _prev, _model.state.gyro.adc, ACCEL_G))
+      {
+        _calibrationBias += (accel - _calibrationBias) * _model.state.accel.biasAlpha;
+        _model.state.accel.biasSamples--;
+      }
+      else
+      {
+        _model.state.accel.biasSamples = 2 * _model.state.accel.timer.rate;
+      }
+      _prev = accel;
+      accel -= _model.state.accel.bias;
       if (_model.state.accel.biasSamples <= 0)
       {
         _model.state.accel.calibrationState = CALIBRATION_APPLY;
       }
       break;
     case CALIBRATION_APPLY:
+      _model.state.accel.bias = _calibrationBias;
       _model.state.accel.bias.z -= ACCEL_G;
+      accel -= _model.state.accel.bias;
       _model.state.accel.calibrationState = CALIBRATION_SAVE;
       break;
     case CALIBRATION_SAVE:
+      accel -= _model.state.accel.bias;
       _model.finishCalibration();
       _model.state.accel.calibrationState = CALIBRATION_IDLE;
       break;

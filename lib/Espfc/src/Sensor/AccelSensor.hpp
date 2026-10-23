@@ -23,6 +23,8 @@ private:
   Model& _model;
   Device::GyroDevice* _gyro;
   Utils::Filter _filter[AXIS_COUNT_RPY];
+  VectorFloat _calibrationBias;
+  VectorFloat _prev;
 };
 
 } // namespace Espfc::Sensor

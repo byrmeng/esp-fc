@@ -373,6 +373,10 @@ void FAST_CODE_ATTR GyroSensor::calibrate()
         _model.state.gyro.bias += (_model.state.gyro.adc - _model.state.gyro.bias) * _model.state.gyro.biasAlpha;
         _model.state.gyro.biasSamples--;
       }
+      else
+      {
+        _model.state.gyro.biasSamples = 2 * _model.state.gyro.calibrationRate;
+      }
       // keep using the current bias meanwhile, raw gyro makes the attitude drift until the board is held still
       _model.state.gyro.adc -= _model.state.gyro.bias;
       if (_model.state.gyro.biasSamples <= 0) _model.state.gyro.calibrationState = CALIBRATION_APPLY;
