@@ -5,7 +5,7 @@ namespace Espfc {
 
 SensorManager::SensorManager(Model& model)
     : _model(model), _gyro(model), _accel(model), _mag(model), _baro(model), _voltage(model), _fusion(model),
-      _altitude(model), _fusionUpdate(false)
+      _altitude(model), _fusionUpdate(false), _calibrating(false)
 {
 }
 
@@ -64,11 +64,6 @@ int FAST_CODE_ATTR SensorManager::read()
 int FAST_CODE_ATTR SensorManager::preLoop()
 {
   _gyro.filter();
-  if (_model.state.gyro.biasSamples == 0)
-  {
-    _model.state.gyro.biasSamples = -1;
-    _fusion.restoreGain();
-  }
   return 1;
 }
 
@@ -80,6 +75,13 @@ int SensorManager::postLoop()
 
 int FAST_CODE_ATTR SensorManager::fusion()
 {
+  const bool calibrating = _model.calibrationActive();
+  if (_calibrating && !calibrating)
+  {
+    _fusion.finishCalibration();
+  }
+  _calibrating = calibrating;
+
   _fusion.update();
   _altitude.update();
   return 1;

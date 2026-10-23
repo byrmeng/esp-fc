@@ -210,6 +210,46 @@ void test_mahony_pitch_converges()
   TEST_ASSERT_FLOAT_WITHIN(0.03f, pitch, e.y);
 }
 
+// Winds up the integral against a gyro bias of 0.1 rad/s on X while level, then removes the bias
+// and tilts the board 45 deg in pitch. Returns the rotation over 1 s once the attitude has settled.
+static float mahony_rotation_after_windup(bool reset)
+{
+  const float pitch = 45.0f * PI_F / 180.0f;
+  Mahony f;
+  f.begin(1000.0f);
+  f.setKp(5.0f);
+  f.setKi(2.0f);
+
+  for (int i = 0; i < 20000; i++)
+  {
+    f.update(0.1f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+  }
+  if (reset) f.resetIntegral();
+
+  Quaternion q0;
+  for (int i = 0; i < 21000; i++)
+  {
+    f.update(0.0f, 0.0f, 0.0f, -std::sin(pitch), 0.0f, std::cos(pitch));
+    if (i == 19999) q0 = f.getQuaternion();
+  }
+  Quaternion q1 = f.getQuaternion();
+  // Mahony normalizes with a fast inverse square root, so the quaternions are not exactly unit length
+  const double dot = std::fabs((double)q0.w * q1.w + (double)q0.x * q1.x + (double)q0.y * q1.y + (double)q0.z * q1.z) /
+                     ((double)q0.getMagnitude() * q1.getMagnitude());
+  return (float)(2.0 * std::acos(std::fmin(1.0, dot)));
+}
+
+void test_mahony_integral_windup_turns_yaw()
+{
+  // the integral part along gravity cannot be corrected by accel, the attitude keeps turning
+  TEST_ASSERT_GREATER_THAN_FLOAT(0.03f, mahony_rotation_after_windup(false));
+}
+
+void test_mahony_reset_integral_stops_rotation()
+{
+  TEST_ASSERT_FLOAT_WITHIN(0.002f, 0.0f, mahony_rotation_after_windup(true));
+}
+
 // -------------------------------------------------------- Complementary ---
 
 void test_complementary_follows_position()
@@ -527,6 +567,8 @@ int main(int argc, char** argv)
 
   RUN_TEST(test_mahony_level_converges);
   RUN_TEST(test_mahony_pitch_converges);
+  RUN_TEST(test_mahony_integral_windup_turns_yaw);
+  RUN_TEST(test_mahony_reset_integral_stops_rotation);
 
   RUN_TEST(test_complementary_follows_position);
   RUN_TEST(test_complementary_integrates_rate);

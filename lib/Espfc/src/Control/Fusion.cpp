@@ -59,6 +59,13 @@ void Fusion::restoreGain()
   _rtqf.setKp(_model.config.fusion.gain * 0.00005f);
 }
 
+void Fusion::finishCalibration()
+{
+  restoreGain();
+  // integral wound up against the old bias; the part along gravity is unobservable without mag and would turn yaw
+  _mahony.resetIntegral();
+}
+
 int FAST_CODE_ATTR Fusion::update()
 {
   Utils::Stats::Measure measure(_model.state.stats, COUNTER_IMU_FUSION);

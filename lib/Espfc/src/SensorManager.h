@@ -39,6 +39,7 @@ private:
   Control::Fusion _fusion;
   Control::Altitude _altitude;
   bool _fusionUpdate;
+  bool _calibrating;
   Device::Input::InputButton _button;
 };
 

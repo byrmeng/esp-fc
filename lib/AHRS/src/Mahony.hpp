@@ -55,6 +55,13 @@ public:
     twoKi = i;
   }
 
+  void resetIntegral()
+  {
+    integralFBx = 0.0f;
+    integralFBy = 0.0f;
+    integralFBz = 0.0f;
+  }
+
   const Quaternion getQuaternion() const
   {
     return {q0, q1, q2, q3};

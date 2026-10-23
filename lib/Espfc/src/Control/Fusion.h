@@ -16,6 +16,7 @@ public:
   int reload(ModelChangeEvent event);
   int update();
   void restoreGain();
+  void finishCalibration();
 
 private:
   Quaternion madgwickFusion(VectorFloat g, VectorFloat a, VectorFloat m);
